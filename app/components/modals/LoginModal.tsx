@@ -1,28 +1,29 @@
 'use client';
-import { signIn } from 'next-auth/react'
-import { AiFillGithub } from "react-icons/ai";
-import { FcGoogle } from "react-icons/fc";
+
 import { useCallback, useState } from "react";
 import { toast } from "react-hot-toast";
+import { signIn } from 'next-auth/react';
 import { 
   FieldValues, 
-  SubmitHandler,
+  SubmitHandler, 
   useForm
 } from "react-hook-form";
+import { FcGoogle } from "react-icons/fc";
+import { AiFillGithub } from "react-icons/ai";
+import { useRouter } from "next/navigation";
 
-import useLoginModal from "@/app/hooks/useLoginModal";
 import useRegisterModal from "@/app/hooks/useRegisterModal";
+import useLoginModal from "@/app/hooks/useLoginModal";
 
 import Modal from "./Modal";
 import Input from "../inputs/Input";
 import Heading from "../Heading";
 import Button from "../Button";
-import { useRouter } from 'next/navigation';
 
 const LoginModal = () => {
   const router = useRouter();
-  const registerModal = useRegisterModal();
   const loginModal = useLoginModal();
+  const registerModal = useRegisterModal();
   const [isLoading, setIsLoading] = useState(false);
 
   const { 
@@ -37,29 +38,31 @@ const LoginModal = () => {
       password: ''
     },
   });
-
-  const onSubmit: SubmitHandler<FieldValues> = (data) => {
+  
+  const onSubmit: SubmitHandler<FieldValues> = 
+  (data) => {
     setIsLoading(true);
-      signIn('credentials', {
-        ...data,
-        redirect: false,
-      })
-      .then((callback) => {
-        setIsLoading(false);
 
-        if (callback?.ok) {
-          toast.success('Logged in')
-          router.refresh();
-          loginModal.onClose();
-        }
+    signIn('credentials', { 
+      ...data, 
+      redirect: false,
+    })
+    .then((callback) => {
+      setIsLoading(false);
 
-        if (callback?.error) {
-          toast.error(callback.error);
-        }
-      })
+      if (callback?.ok) {
+        toast.success('Logged in');
+        router.refresh();
+        loginModal.onClose();
+      }
+      
+      if (callback?.error) {
+        toast.error(callback.error);
+      }
+    });
   }
 
-  const toggle = useCallback(() => {
+  const onToggle = useCallback(() => {
     loginModal.onClose();
     registerModal.onOpen();
   }, [loginModal, registerModal])
@@ -74,7 +77,7 @@ const LoginModal = () => {
         id="email"
         label="Email"
         disabled={isLoading}
-        register={register}
+        register={register}  
         errors={errors}
         required
       />
@@ -97,7 +100,7 @@ const LoginModal = () => {
         outline 
         label="Continue with Google"
         icon={FcGoogle}
-        onClick={() => signIn('google')} 
+        onClick={() => signIn('google')}
       />
       <Button 
         outline 
@@ -105,17 +108,11 @@ const LoginModal = () => {
         icon={AiFillGithub}
         onClick={() => signIn('github')}
       />
-      <div 
-        className="
-          text-neutral-500 
-          text-center 
-          mt-4 
-          font-light
-        "
-      >
+      <div className="
+      text-neutral-500 text-center mt-4 font-light">
         <p>First time using Airbnb?
           <span 
-            onClick={toggle} 
+            onClick={onToggle} 
             className="
               text-neutral-800
               cursor-pointer 
